@@ -1,54 +1,55 @@
-# 🎮 Game Glitch Investigator: The Impossible Guesser
+# Game Glitch Investigator
 
-## 🚨 The Situation
+## Project Overview
 
-You asked an AI to build a simple "Number Guessing Game" using Streamlit.
-It wrote the code, ran away, and now the game is unplayable. 
+This is a number guessing game built with Python and Streamlit. The player chooses a difficulty, guesses a secret number, gets higher/lower hints, and tries to win before the attempts run out. I debugged the starter project and moved the main rules into `logic_utils.py` so they could be tested separately.
 
-- You can't win.
-- The hints lie to you.
-- The secret number seems to have commitment issues.
+## Setup
 
-## 🛠️ Setup
+1. Open the project folder in VS Code.
+2. Install the packages: `python -m pip install -r requirements.txt`
+3. Start the game: `python -m streamlit run app.py`
+4. Open the local address shown in the terminal.
+5. Run tests with `python -m pytest -q`.
 
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run the broken app: `python -m streamlit run app.py`
+## Bugs and Fixes
 
-## 🕵️‍♂️ Your Mission
+- Hints were backwards: higher guesses said to go higher. I fixed the messages in `check_guess()`.
+- The secret was changed to a string on some turns. I kept it as an integer so winning works every time.
+- Wrong guesses sometimes increased the score. Now a wrong guess loses 5 points (but the score will not go below zero), and a win awards points.
+- Attempts started at 1, and invalid text used an attempt. Now attempts start at 0 and only valid guesses count.
+- New Game did not reset the score or status and did not use the difficulty's range. Now it resets the entire game.
+- Some difficulty ranges and on-screen directions were inconsistent. Now Easy is 1–20, Normal is 1–100, and Hard is 1–200.
+- During manual testing, clicking New Game caused a Streamlit session-state error. I changed the reset logic to remove the `guess_entry` key instead of directly modifying the input after the widget was created. I tested the button again, and the error no longer appeared. 
 
-1. **Play the game.** Open the "Developer Debug Info" tab in the app to see the secret number. Try to win.
-2. **Find the State Bug.** Why does the secret number change every time you click "Submit"? Ask ChatGPT: *"How do I keep a variable from resetting in Streamlit when I click a button?"*
-3. **Fix the Logic.** The hints ("Higher/Lower") are wrong. Fix them.
-4. **Refactor & Test.** - Move the logic into `logic_utils.py`.
-   - Run `pytest` in your terminal.
-   - Keep fixing until all tests pass!
+## Demo Walkthrough
 
-## 📝 Document Your Experience
+This example assumes the secret number is **50** in Normal mode. The real secret is random; you can check it under **Developer Debug Info** while testing.
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+1. Start a game on Normal difficulty; the range is 1–100 and 8 attempts are available.
+2. Enter `40` and select **Submit Guess**. The game says **Go HIGHER!** and shows 7 attempts left.
+3. Enter `70`. The game says **Go LOWER!** and shows 6 attempts left.
+4. Enter `50`. The game reports a win and shows the final score.
+5. Select **New Game**. The score, guess history, attempt counter, and win status reset.
 
-## 📸 Demo Walkthrough
+## Document Your Experience
 
-Describe your fixed game in numbered steps so a reader can follow along without watching a video:
+I used ChatGPT to review the starter code and propose the fixes, then checked the code's logic and the test results. The biggest problems were reversed hints, mixing strings and numbers, and not resetting Streamlit session state correctly. Moving functions into `logic_utils.py` made the game rules easier to understand and test. I kept the changes small instead of rebuilding the whole app.
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+## Automated Test Results
 
-**Screenshot** *(optional)*: <!-- Insert a screenshot of your fixed, winning game here -->
+I ran `python -m pytest -q` on the completed game logic in the development environment:
 
-## 🧪 Test Results
-
-```
-# Paste your pytest output here, e.g.:
-# pytest tests/
-# ========================= X passed in 0.XXs =========================
+```text
+...............                                                          [100%]
+15 passed in 0.05s
 ```
 
-## 🚀 Stretch Features
+The automated tests cover winning, high/low hints, input parsing, difficulty ranges, and scoring. The Streamlit interface also needs to be checked manually on the user's computer.
 
-- [ ] [If you choose to complete Challenge 4, describe the Enhanced UI changes here — a screenshot is optional]
+## Files
+
+- `app.py` — Streamlit user interface and game state
+- `logic_utils.py` — guessing, input, scoring, and difficulty rules
+- `tests/test_game_logic.py` — automated pytest tests
+- `reflection.md` — bug logs and discussion of AI assistance
